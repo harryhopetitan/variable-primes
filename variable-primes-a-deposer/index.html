@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Variables &amp; Primes – Harry Hope</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@400;500;600;700&family=Bodoni+Moda:opsz,wght@6..96,500&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="locked">
+<!-- Écran d'accès (js/gate.js) : l'application n'est chargée qu'après saisie du mot de passe -->
+<div id="gate" class="gate">
+  <div class="gate-inner">
+    <div class="gate-brand"><span class="logo">Harry Hope.</span><span class="sep" aria-hidden="true"></span><span class="gate-app">Variables &amp; Primes</span></div>
+    <form id="gate-form" class="gate-card" autocomplete="off">
+      <div class="eyebrow">Accès réservé</div>
+      <h2>Connexion à l'outil</h2>
+      <p class="gate-sub">Saisissez le mot de passe communiqué par la direction pour accéder aux variables et primes.</p>
+      <label for="gate-pw" class="gate-label">Mot de passe</label>
+      <div class="gate-field">
+        <input id="gate-pw" type="password" autocomplete="current-password" spellcheck="false" required>
+        <button type="button" id="gate-show" class="gate-show" aria-pressed="false" aria-controls="gate-pw">Afficher</button>
+      </div>
+      <p id="gate-msg" class="gate-msg" role="alert" aria-live="assertive"></p>
+      <button type="submit" class="btn primary gate-submit">Accéder à l'outil</button>
+    </form>
+    <p class="gate-foot">Outil interne · données confidentielles</p>
+  </div>
+</div>
+<header class="top">
+  <div class="band"><div class="wrap top-row">
+    <div class="brand"><span class="logo">Harry Hope.</span><span class="sep" aria-hidden="true"></span><h1>Variables &amp; Primes</h1></div>
+    <div class="pilot">
+      <label class="eyebrow" for="agence-sel">Cabinet</label>
+      <select id="agence-sel" aria-label="Cabinet"></select>
+      <div class="stepper" role="group" aria-label="Mois de paie">
+        <button id="prev-m" aria-label="Mois précédent">‹</button>
+        <div class="cur"><b id="paie-label">—</b><small id="ca-label">—</small></div>
+        <button id="next-m" aria-label="Mois suivant">›</button>
+      </div>
+      <span id="status-pill"></span>
+      <button id="logout" class="btn ghost logout" hidden title="Se déconnecter">Se déconnecter</button>
+    </div>
+  </div></div>
+  <div class="tabbar"><div class="wrap"><nav class="tabs" id="tabs" role="tablist"></nav></div></div>
+</header>
+<main class="wrap" id="view"><div class="empty"><b>Chargement des données…</b>Connexion à la base de l'outil.</div></main>
+<div id="overlay"></div>
+
+<!-- Configuration, puis contrôle d'accès : js/gate.js charge la couche plateforme et l'application après le mot de passe -->
+<script src="js/config.js"></script>
+<script src="js/donnees.js"></script>
+<script src="js/gate.js"></script>
+</body>
+</html>

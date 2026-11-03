@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Mot de passe – Harry Hope</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@400;500;600;700&family=Bodoni+Moda:opsz,wght@6..96,500&display=swap">
+<link rel="stylesheet" href="../css/styles.css">
+<style>
+  .gate-card textarea { margin-top: 6px; min-height: 150px; resize: vertical; }
+  .gate-card .row { margin-top: 14px; }
+  .gate-ok { color: var(--good); font-size: 13px; min-height: 20px; margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<div class="gate">
+  <div class="gate-inner" style="max-width:520px">
+    <div class="gate-brand"><span class="logo">Harry Hope.</span><span class="sep" aria-hidden="true"></span><span class="gate-app">Mot de passe d'accès</span></div>
+    <form id="f" class="gate-card" autocomplete="off">
+      <div class="eyebrow">Administration</div>
+      <h2>Définir un nouveau mot de passe</h2>
+      <p class="callout" style="margin:0 0 12px;color:var(--ink)">Le projet contient des données chiffrées (<code>js/donnees.js</code>) : utilisez plutôt <code>outils/changer-mot-de-passe.py</code>, qui les rechiffre. Cette page ne sert que pour un site sans données.</p>
+      <p class="gate-sub">Le mot de passe n'est pas enregistré : cette page calcule son empreinte, à coller dans <code>js/config.js</code> à la place du bloc <code>acces</code>. Rien n'est envoyé sur Internet.</p>
+      <label for="pw" class="gate-label">Nouveau mot de passe (12 caractères minimum)</label>
+      <div class="gate-field"><input id="pw" type="password" autocomplete="new-password" minlength="12" required></div>
+      <label for="pw2" class="gate-label" style="margin-top:12px">Confirmation</label>
+      <div class="gate-field"><input id="pw2" type="password" autocomplete="new-password" required></div>
+      <p id="msg" class="gate-msg" role="alert"></p>
+      <button class="btn primary gate-submit" type="submit">Générer le bloc de configuration</button>
+      <label for="out" class="gate-label" style="margin-top:18px">Bloc à coller dans js/config.js</label>
+      <textarea id="out" readonly rows="7" placeholder="Le bloc apparaîtra ici."></textarea>
+      <div class="row"><button class="btn" type="button" id="copy" disabled>Copier</button><span id="ok" class="gate-ok" aria-live="polite"></span></div>
+    </form>
+    <p class="gate-foot">Après modification, toutes les sessions ouvertes devront saisir le nouveau mot de passe.</p>
+  </div>
+</div>
+<script>
+(() => {
+  const ITER = 210000, $ = (id) => document.getElementById(id);
+  const hex = (b) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+  $("f").addEventListener("submit", async (e) => {
+    e.preventDefault(); $("msg").textContent = ""; $("ok").textContent = "";
+    const pw = $("pw").value;
+    if (pw.length < 12) { $("msg").textContent = "Choisissez au moins 12 caractères."; return; }
+    if (pw !== $("pw2").value) { $("msg").textContent = "Les deux saisies ne correspondent pas."; return; }
+    if (!crypto.subtle) { $("msg").textContent = "Ouvrez cette page en HTTPS ou sur localhost."; return; }
+    const sel = crypto.getRandomValues(new Uint8Array(16));
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveBits"]);
+    const h = hex(await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: sel, iterations: ITER }, key, 256));
+    $("out").value = `  acces: {\n    sel: "${hex(sel)}",\n    iterations: ${ITER},\n    empreinte: "${h}",\n    dureeSessionHeures: 12,\n  },`;
+    $("copy").disabled = false; $("pw").value = $("pw2").value = "";
+  });
+  $("copy").onclick = async () => { try { await navigator.clipboard.writeText($("out").value); $("ok").textContent = "Copié."; } catch (e) { $("out").select(); $("ok").textContent = "Sélectionné : copiez avec Ctrl+C."; } };
+})();
+</script>
+</body>
+</html>
